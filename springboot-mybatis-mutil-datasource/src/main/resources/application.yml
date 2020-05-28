@@ -9,7 +9,7 @@ spring:
       password: 123456
       driver-class-name: com.mysql.cj.jdbc.Driver
     db2:
-      url: jdbc:mysql://localhost:3307/db_2?useUnicode=true&characterEncoding=utf-8
+      url: jdbc:mysql://localhost:3306/db_2?useUnicode=true&characterEncoding=utf-8
       username: root
       password: 123456
       driver-class-name: com.mysql.cj.jdbc.Driver
@@ -19,12 +19,3 @@ logging:
     root: info
     com.qsl.springboot.dao: debug
 
-# MyBatis Plus \u914D\u7F6E\u9879
-mybatis-plus:
-  configuration:
-    map-underscore-to-camel-case: true # \u867D\u7136\u9ED8\u8BA4\u4E3A true \uFF0C\u4F46\u662F\u8FD8\u662F\u663E\u793A\u53BB\u6307\u5B9A\u4E0B\u3002
-  global-config:
-    db-config:
-      id-type: auto
-      logic-delete-value: 1 # \u903B\u8F91\u5DF2\u5220\u9664\u503C(\u9ED8\u8BA4\u4E3A 1)
-      logic-not-delete-value: 0 # \u903B\u8F91\u672A\u5220\u9664\u503C(\u9ED8\u8BA4\u4E3A 0)

@@ -1,0 +1,6 @@
+CREATE TABLE `t_order` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `order_no` int(11) DEFAULT NULL COMMENT '订单流水号',
+  `user_id` int(11) DEFAULT NULL COMMENT '用户ID',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8

@@ -24,7 +24,7 @@ import javax.sql.DataSource;
 @MapperScan(basePackages = "com.qsl.springboot.dao.db2", sqlSessionTemplateRef = "db2SqlSessionTemplate")
 public class Db2DataSourceConfig {
 
-    private static final String MAPPER_LOCATION = "classpath*:mapper/db2/*.xml";
+    private static final String MAPPER_LOCATION = "classpath*:mapper/db2/*Mapper.xml";
 
     /**
      * 创建 db2 数据源

@@ -25,7 +25,7 @@ import javax.sql.DataSource;
 @MapperScan(basePackages = "com.qsl.springboot.dao.db1", sqlSessionTemplateRef = "db1SqlSessionTemplate")
 public class Db1DataSourceConfig {
 
-    private static final String MAPPER_LOCATION = "classpath*:mapper/db1/*.xml";
+    private static final String MAPPER_LOCATION = "classpath*:mapper/db1/*Mapper.xml";
 
     /**
      * 创建 db1 数据源  @Primary 注解声明为默认数据源
