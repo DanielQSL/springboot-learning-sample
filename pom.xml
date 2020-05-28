@@ -13,6 +13,7 @@
 
     <modules>
         <module>springboot-mybatis-mutil-datasource</module>
+        <module>springboot-mybatis</module>
     </modules>
 
 </project>
