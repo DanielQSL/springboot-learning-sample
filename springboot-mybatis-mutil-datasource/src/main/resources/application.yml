@@ -19,3 +19,9 @@ logging:
     root: info
     com.qsl.springboot.dao: debug
 
+
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql

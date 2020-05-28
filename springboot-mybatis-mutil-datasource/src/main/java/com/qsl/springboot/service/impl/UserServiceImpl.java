@@ -1,5 +1,6 @@
 package com.qsl.springboot.service.impl;
 
+import com.github.pagehelper.PageHelper;
 import com.qsl.springboot.dao.db1.UserMapper;
 import com.qsl.springboot.dao.db2.OrderMapper;
 import com.qsl.springboot.dataobject.OrderDO;
@@ -29,8 +30,9 @@ public class UserServiceImpl implements UserService {
     public List<UserDO> list() {
         List<UserDO> users = userMapper.list();
         log.info("users: {}", users);
+        PageHelper.startPage(2, 1, false);
         List<OrderDO> orders = orderMapper.list();
-        log.info("order: {}",orders);
+        orders.forEach(order -> log.info("order: {}", order));
         return users;
     }
 }

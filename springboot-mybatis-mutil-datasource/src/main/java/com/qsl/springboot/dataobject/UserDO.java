@@ -1,6 +1,5 @@
 package com.qsl.springboot.dataobject;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 /**
