@@ -1,0 +1,27 @@
+server:
+  port: 7070
+
+spring:
+  datasource:
+    db1:
+      url: jdbc:mysql://localhost:3306/db_1?useUnicode=true&characterEncoding=utf-8
+      username: root
+      password: 123456
+      driver-class-name: com.mysql.cj.jdbc.Driver
+    db2:
+      url: jdbc:mysql://localhost:3306/db_2?useUnicode=true&characterEncoding=utf-8
+      username: root
+      password: 123456
+      driver-class-name: com.mysql.cj.jdbc.Driver
+
+logging:
+  level:
+    root: info
+    com.qsl.springboot.dao: debug
+
+
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
