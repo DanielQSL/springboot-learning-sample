@@ -1,5 +1,0 @@
-spring:
-  data:
-    # Jest \u914D\u7F6E\u9879
-    jest:
-      uri: http://127.0.0.1:9200
