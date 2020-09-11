@@ -5,10 +5,15 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
+import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.scripting.ScriptSource;
+import org.springframework.scripting.support.ResourceScriptSource;
 
 /**
  * Redis配置
@@ -51,6 +56,20 @@ public class RedisConfig {
 
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
+    }
+
+    /**
+     * 频率控制lua脚本
+     *
+     * @return lua脚本
+     */
+    @Bean("incrAndExpireLuaScript")
+    public RedisScript<Long> incrAndExpireLuaScript() {
+        ScriptSource scriptSource = new ResourceScriptSource(new ClassPathResource("scripts/FrequencyControl.lua"));
+        DefaultRedisScript<Long> incrAndExpireLuaScript = new DefaultRedisScript<>();
+        incrAndExpireLuaScript.setResultType(Long.class);
+        incrAndExpireLuaScript.setScriptSource(scriptSource);
+        return incrAndExpireLuaScript;
     }
 
 }
