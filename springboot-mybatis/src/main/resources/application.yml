@@ -9,12 +9,12 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 mybatis:
-  # \u914D\u7F6E MyBatis \u914D\u7F6E\u6587\u4EF6\u8DEF\u5F84
+  # 配置 MyBatis 配置文件路径
   mapper-locations: classpath:mapper/*Mapper.xml
-  # \u914D\u7F6E\u6570\u636E\u5E93\u5B9E\u4F53\u5305\u8DEF\u5F84
+  # 配置数据库实体包路径
   type-aliases-package: com.qsl.springboot.dataobject
   configuration:
-    # \u9A7C\u5CF0\u547D\u540D
+    # 驼峰命名
     map-underscore-to-camel-case: true
     cache-enabled: true
     local-cache-scope: session
