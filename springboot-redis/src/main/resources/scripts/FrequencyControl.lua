@@ -18,7 +18,7 @@ else
         return 1
     else
         redis.call('LPUSH', KEYS[1], tonumber(ARGV[3]))
-        redis.call('LTRIM', KEYS[1], 0, tonumber(ARGV[2]))
+        redis.call('LTRIM', KEYS[1], 0, tonumber(ARGV[2])-1)
     end
 end
 return 0
