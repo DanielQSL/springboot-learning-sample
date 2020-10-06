@@ -14,7 +14,10 @@
     <modules>
         <module>springboot-mybatis-mutil-datasource</module>
         <module>springboot-mybatis</module>
+        <module>springboot-redis</module>
         <module>springboot-redisson</module>
+        <module>springboot-elasticsearch7</module>
+        <module>springboot-hbase</module>
     </modules>
 
 </project>
