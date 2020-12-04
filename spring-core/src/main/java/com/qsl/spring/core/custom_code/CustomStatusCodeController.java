@@ -1,4 +1,4 @@
-package com.qsl.spring.core.controller;
+package com.qsl.spring.core.custom_code;
 
 import com.qsl.spring.core.common.ServerResponse;
 import com.qsl.spring.core.exception.BadRequestException;
