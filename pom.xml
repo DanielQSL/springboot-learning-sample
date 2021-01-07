@@ -20,6 +20,7 @@
         <module>springboot-hbase</module>
         <module>java-core</module>
         <module>spring-core</module>
+        <module>springboot-core</module>
     </modules>
 
 </project>
