@@ -1,5 +1,9 @@
 spring:
-  task:
-    scheduling:
-      pool:
-        size: 5
+#  task:
+#    scheduling:
+#      pool:
+#        size: 5
+#    execution:
+#      thread-name-prefix: qsl-task-
+#      pool:
+#        core-size: 16
