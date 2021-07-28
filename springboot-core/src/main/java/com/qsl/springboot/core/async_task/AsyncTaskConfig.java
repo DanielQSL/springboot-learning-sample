@@ -45,9 +45,8 @@ public class AsyncTaskConfig implements AsyncConfigurer {
         return new AsyncUncaughtExceptionHandler() {
             @Override
             public void handleUncaughtException(Throwable ex, Method method, Object... params) {
-                log.error("Async has some error. {}, {}, {}", ex.getMessage(),
-                        method.getDeclaringClass().getName() + "." + method.getName(),
-                        Arrays.toString(params));
+                log.error("Async has some error. {}, {}, {}", method.getDeclaringClass().getName() + "." + method.getName(),
+                        Arrays.toString(params), ex.getMessage(), ex);
             }
         };
     }
