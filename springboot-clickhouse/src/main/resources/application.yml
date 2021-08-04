@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: springboot-clickhouse
+  datasource:
+    clickhouse:
+      url: jdbc:clickhouse://xxxx.com:8123/db_test
+      username: admin
+      password: admin
+      driverClassName: ru.yandex.clickhouse.ClickHouseDriver
+      type: com.alibaba.druid.pool.DruidDataSource
+      initialSize: 10
+      minIdle: 10
+      maxActive: 100
+      maxWait: 6000

@@ -21,6 +21,7 @@
         <module>java-core</module>
         <module>spring-core</module>
         <module>springboot-core</module>
+        <module>springboot-clickhouse</module>
     </modules>
 
 </project>
