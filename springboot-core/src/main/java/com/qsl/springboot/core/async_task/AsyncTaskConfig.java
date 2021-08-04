@@ -2,12 +2,12 @@ package com.qsl.springboot.core.async_task;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -23,10 +23,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Configuration
 public class AsyncTaskConfig implements AsyncConfigurer {
 
-    @Override
-    public Executor getAsyncExecutor() {
+    @Bean("ownerAsyncExecutor")
+    public ThreadPoolTaskExecutor executor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setThreadNamePrefix("qsl-task-");
+        executor.setThreadNamePrefix("ownerAsyncExecutor-");
         executor.setCorePoolSize(20);
         executor.setMaxPoolSize(20);
         executor.setKeepAliveSeconds(5);
@@ -41,13 +41,14 @@ public class AsyncTaskConfig implements AsyncConfigurer {
     }
 
     @Override
-    public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
-        return new AsyncUncaughtExceptionHandler() {
-            @Override
-            public void handleUncaughtException(Throwable ex, Method method, Object... params) {
-                log.error("Async has some error. {}, {}, {}", method.getDeclaringClass().getName() + "." + method.getName(),
-                        Arrays.toString(params), ex.getMessage(), ex);
-            }
-        };
+    public Executor getAsyncExecutor() {
+        return executor();
     }
+
+    @Override
+    public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
+        return (ex, method, params) -> log.error("Async has some error. {}, {}, {}", method.getDeclaringClass().getName() + "." + method.getName(),
+                Arrays.toString(params), ex.getMessage(), ex);
+    }
+
 }
