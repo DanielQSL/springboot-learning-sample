@@ -22,6 +22,7 @@
         <module>spring-core</module>
         <module>springboot-core</module>
         <module>springboot-clickhouse</module>
+        <module>qsl-spring-boot-starter</module>
     </modules>
 
 </project>

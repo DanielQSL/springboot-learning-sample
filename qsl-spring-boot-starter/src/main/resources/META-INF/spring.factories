@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.qsl.aspectlog.config.AspectLogAutoConfiguration\
+com.qsl.sms.config.SmsAutoConfiguration
