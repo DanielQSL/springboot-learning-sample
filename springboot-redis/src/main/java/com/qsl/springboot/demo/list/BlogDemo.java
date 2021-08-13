@@ -1,11 +1,12 @@
-package com.qsl.springboot.demo.hash;
+package com.qsl.springboot.demo.list;
 
 import com.qsl.springboot.constants.RedisConstant;
-import org.springframework.util.StringUtils;
 import redis.clients.jedis.Jedis;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * 博客网站案例
@@ -16,7 +17,6 @@ public class BlogDemo {
 
     /**
      * 获取博客id
-     *
      * @return
      */
     public long getBlogId() {
@@ -27,18 +27,19 @@ public class BlogDemo {
      * 发表一篇博客
      */
     public boolean publishBlog(long id, Map<String, String> blog) {
-        if (jedis.hexists("article::" + id, "title")) {
+        if(jedis.hexists("article::" + id, "title")) {
             return false;
         }
         blog.put("content_length", String.valueOf(blog.get("content").length()));
 
         jedis.hmset("article::" + id, blog);
+        jedis.lpush("blog_list", String.valueOf(id));
+
         return true;
     }
 
     /**
      * 查看一篇博客
-     *
      * @param id
      * @return
      */
@@ -49,8 +50,27 @@ public class BlogDemo {
     }
 
     /**
+     * 更新一篇博客
+     */
+    public void updateBlog(long id, Map<String, String> updatedBlog) {
+        String updatedContent = updatedBlog.get("content");
+        if(updatedContent != null && !"".equals(updatedContent)) {
+            updatedBlog.put("content_length", String.valueOf(updatedContent.length()));
+        }
+
+        jedis.hmset("article::" + id, updatedBlog);
+    }
+
+    /**
+     * 对博客进行点赞
+     * @param id
+     */
+    public void incrementBlogLikeCount(long id) {
+        jedis.hincrBy("article::" + id, "like_count", 1);
+    }
+
+    /**
      * 增加博客浏览次数
-     *
      * @param id
      */
     public void incrementBlogViewCount(long id) {
@@ -58,23 +78,15 @@ public class BlogDemo {
     }
 
     /**
-     * 更新一篇博客
+     * 分页查询博客
+     * @param pageNo
+     * @param pageSize
+     * @return
      */
-    public void updateBlog(long id, Map<String, String> updatedBlog) {
-        String updatedContent = updatedBlog.get("content");
-        if (StringUtils.hasText(updatedContent)) {
-            updatedBlog.put("content_length", String.valueOf(updatedContent.length()));
-        }
-        jedis.hmset("article::" + id, updatedBlog);
-    }
-
-    /**
-     * 对博客进行点赞
-     *
-     * @param id
-     */
-    public void incrementBlogLikeCount(long id) {
-        jedis.hincrBy("article::" + id, "like_count", 1);
+    public List<String> findBlogByPage(int pageNo, int pageSize) {
+        int startIndex = (pageNo - 1) * pageSize;
+        int endIndex = pageNo * pageSize - 1;
+        return jedis.lrange("blog_list", startIndex, endIndex);
     }
 
     public static void main(String[] args) {
@@ -82,7 +94,8 @@ public class BlogDemo {
 
         // 发表一篇博客
         long id = demo.getBlogId();
-        Map<String, String> blog = new HashMap<>();
+
+        Map<String, String> blog = new HashMap<String, String>();
         blog.put("id", String.valueOf(id));
         blog.put("title", "我喜欢学习Redis");
         blog.put("content", "学习Redis是一件特别快乐的事情");
@@ -98,13 +111,51 @@ public class BlogDemo {
 
         demo.updateBlog(id, updatedBlog);
 
+        // 构造20篇博客数据
+        for(int i = 0; i < 20; i++) {
+            id = demo.getBlogId();
+
+            blog = new HashMap<String, String>();
+            blog.put("id", String.valueOf(id));
+            blog.put("title", "第" + (i + 1) + "篇博客");
+            blog.put("content", "学习第" + (i + 1) + "篇博客，是一件很有意思的事情");
+            blog.put("author", "qsl");
+            blog.put("time", "2020-01-01 10:00:00");
+
+            demo.publishBlog(id, blog);
+        }
+
+        // 有人分页浏览所有的博客，先浏览第一页
+        int pageNo = 1;
+        int pageSize = 10;
+
+        List<String> blogPage = demo.findBlogByPage(pageNo, pageSize);
+        System.out.println("展示第一页的博客......");
+        for(String blogId : blogPage) {
+            blog = demo.findBlogById(Long.valueOf(blogId));
+            System.out.println(blog);
+        }
+
+        pageNo = 2;
+
+        blogPage = demo.findBlogByPage(pageNo, pageSize);
+        System.out.println("展示第二页的博客......");
+        for(String blogId : blogPage) {
+            blog = demo.findBlogById(Long.valueOf(blogId));
+            System.out.println(blog);
+        }
+
         // 有别人点击进去查看你的博客的详细内容，并且进行点赞
-        Map<String, String> blogResult = demo.findBlogById(id);
+        Random random = new Random();
+        int blogIndex = random.nextInt(blogPage.size());
+        String blogId = blogPage.get(blogIndex);
+
+        Map<String, String> blogResult = demo.findBlogById(Long.valueOf(blogId));
         System.out.println("查看博客的详细内容：" + blogResult);
-        demo.incrementBlogLikeCount(id);
+        demo.incrementBlogLikeCount(Long.valueOf(blogId));
 
         // 你自己去查看自己的博客，看看浏览次数和点赞次数
-        blogResult = demo.findBlogById(id);
+        blogResult = demo.findBlogById(Long.valueOf(blogId));
         System.out.println("自己查看博客的详细内容：" + blogResult);
     }
 

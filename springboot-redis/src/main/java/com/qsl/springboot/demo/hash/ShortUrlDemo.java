@@ -5,9 +5,6 @@ import redis.clients.jedis.Jedis;
 
 /**
  * 短网址追踪案例
- *
- * @author qianshuailong
- * @date 2021/8/12
  */
 public class ShortUrlDemo {
 
