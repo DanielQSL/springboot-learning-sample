@@ -1,5 +1,7 @@
 package com.qsl.java.core.stream;
 
+import com.google.common.collect.Lists;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -84,5 +86,20 @@ public class StreamUsage {
         System.out.println("list中大于6的元素个数：" + count);
     }
 
+    /**
+     * 对流扁平化使用
+     */
+    private static void flatMapUsage() {
+        List<List<String>> list = new ArrayList<List<String>>() {{
+            add(Lists.newArrayList("a", "b", "c"));
+            add(Lists.newArrayList("d", "e", "f"));
+            add(Lists.newArrayList("j", "k", "y"));
+        }};
+        // 结果：[[a, b, c], [d, e, f], [j, k, y]]
+        System.out.println(list);
+        List<String> collect = list.stream().flatMap(List::stream).collect(Collectors.toList());
+        // 结果：[a, b, c, d, e, f, j, k, y]
+        System.out.println(collect);
+    }
 
 }
