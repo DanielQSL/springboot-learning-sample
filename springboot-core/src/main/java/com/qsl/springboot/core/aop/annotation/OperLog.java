@@ -15,7 +15,7 @@ public @interface OperLog {
     /**
      * 操作模块
      */
-    String operModul() default "";
+    String operModule() default "";
 
     /**
      * 操作类型

@@ -69,7 +69,7 @@ public class OperLogAspect {
             // 获取操作
             OperLog opLog = method.getAnnotation(OperLog.class);
             if (opLog != null) {
-                String operModul = opLog.operModul();
+                String operModule = opLog.operModule();
                 String operType = opLog.operType();
                 String operDesc = opLog.operDesc();
             }
