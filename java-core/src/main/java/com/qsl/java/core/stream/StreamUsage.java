@@ -79,6 +79,10 @@ public class StreamUsage {
         // 案例三：获取员工工资最高的人。
         Optional<Person> max3 = personList.stream().max(Comparator.comparingInt(Person::getSalary));
         System.out.println("员工工资最大值：" + max3.get().getSalary());
+        // 排序（正序）
+        personList.stream().sorted(Comparator.comparing(Person::getSalary));
+        // 排序（倒序）
+        personList.stream().sorted(Comparator.comparing(Person::getSalary).reversed());
 
         // 案例四：计算Integer集合中大于6的元素的个数。
         List<Integer> list4 = Arrays.asList(7, 6, 4, 8, 2, 11, 9);
