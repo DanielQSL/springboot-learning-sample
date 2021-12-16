@@ -3,6 +3,7 @@ package com.qsl.java.core.stream;
 import com.google.common.collect.Lists;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -104,6 +105,18 @@ public class StreamUsage {
         List<String> collect = list.stream().flatMap(List::stream).collect(Collectors.toList());
         // 结果：[a, b, c, d, e, f, j, k, y]
         System.out.println(collect);
+    }
+
+    /**
+     * 对象转Map
+     */
+    private static void toMap() {
+        // 1、指定key-value，value是对象中的某个属性值。
+        Map<String, Integer> map1 = personList.stream().collect(Collectors.toMap(Person::getName, Person::getSalary));
+        // 2、指定key-value，value是对象本身，Function.identity()是简洁写法，也是返回对象本身（代替 User->User）
+        Map<String, Person> map2 = personList.stream().collect(Collectors.toMap(Person::getName, Function.identity()));
+        // 3、指定key-value，value是对象本身，Function.identity()是简洁写法，也是返回对象本身，key 冲突的解决办法，这里选择第二个key覆盖第一个key
+        Map<String, Person> map3 = personList.stream().collect(Collectors.toMap(Person::getName, Function.identity(), (key1, key2) -> key2));
     }
 
 }
