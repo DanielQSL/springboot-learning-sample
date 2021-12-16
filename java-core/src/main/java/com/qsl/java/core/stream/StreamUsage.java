@@ -3,6 +3,7 @@ package com.qsl.java.core.stream;
 import com.google.common.collect.Lists;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -117,6 +118,10 @@ public class StreamUsage {
         Map<String, Person> map2 = personList.stream().collect(Collectors.toMap(Person::getName, Function.identity()));
         // 3、指定key-value，value是对象本身，Function.identity()是简洁写法，也是返回对象本身，key 冲突的解决办法，这里选择第二个key覆盖第一个key
         Map<String, Person> map3 = personList.stream().collect(Collectors.toMap(Person::getName, Function.identity(), (key1, key2) -> key2));
+        // 4、嵌套map
+        ConcurrentMap<String, ConcurrentMap<Integer, Person>> map4 = personList.stream()
+                .collect(Collectors.groupingByConcurrent(Person::getName,
+                        Collectors.toConcurrentMap(Person::getAge, Function.identity())));
     }
 
 }
