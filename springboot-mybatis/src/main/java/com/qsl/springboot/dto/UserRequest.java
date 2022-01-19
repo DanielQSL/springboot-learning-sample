@@ -2,6 +2,8 @@ package com.qsl.springboot.dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * 请求对象
  *
@@ -22,6 +24,9 @@ public class UserRequest {
 
     /** 所属业务 */
     private Integer belongToBusiness;
+
+    /** 权限列表 */
+    private List<String> permissions;
 
     /** 创建开始时间（毫秒级时间戳） */
     private Long createStartTime;

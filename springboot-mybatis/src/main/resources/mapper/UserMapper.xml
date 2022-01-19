@@ -3,35 +3,36 @@
 <mapper namespace="com.qsl.springboot.dao.UserMapper">
 
     <resultMap id="labelSchemaMap" type="com.qsl.springboot.dto.UserDTO">
-        <result column="id" property="id" jdbcType="BIGINT" />
-        <result column="label_name" property="labelName" jdbcType="VARCHAR" />
-        <result column="label_name_en" property="labelNameEn" jdbcType="VARCHAR" />
-        <result column="label_type" property="labelType" jdbcType="BIGINT" />
-        <result column="first_classification" property="firstClassification" jdbcType="BIGINT" />
-        <result column="second_classification" property="secondClassification" jdbcType="BIGINT" />
-        <result column="belong_to_business" property="belongToBusiness" jdbcType="BIGINT" />
-        <result column="label_value" property="labelValue" jdbcType="VARCHAR" />
-        <result column="source_table" property="sourceTable" jdbcType="VARCHAR" />
-        <result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+        <result column="id" property="id" jdbcType="BIGINT"/>
+        <result column="label_name" property="labelName" jdbcType="VARCHAR"/>
+        <result column="label_name_en" property="labelNameEn" jdbcType="VARCHAR"/>
+        <result column="label_type" property="labelType" jdbcType="BIGINT"/>
+        <result column="first_classification" property="firstClassification" jdbcType="BIGINT"/>
+        <result column="second_classification" property="secondClassification" jdbcType="BIGINT"/>
+        <result column="belong_to_business" property="belongToBusiness" jdbcType="BIGINT"/>
+        <result column="label_value" property="labelValue" jdbcType="VARCHAR"/>
+        <result column="source_table" property="sourceTable" jdbcType="VARCHAR"/>
+        <result column="update_time" property="updateTime" jdbcType="VARCHAR"/>
     </resultMap>
 
     <select id="list" resultType="com.qsl.springboot.dataobject.UserDO">
-        select * from t_user
+        select *
+        from t_user
     </select>
 
     <select id="listTestFormat" resultMap="labelSchemaMap">
         SELECT
-            ls.id,
-            ls.label_name,
-            ls.label_name_en,
-            ls.label_type,
-            ls.first_classification,
-            ls.second_classification,
-            ls.belong_to_business,
-            ls.label_value,
-            ls.source_table,
-            DATE_FORMAT(ls.update_time, '%Y-%m-%d %H:%i:%s') AS update_time,
-            UNIX_TIMESTAMP(ls.update_time) AS update_time2
+        ls.id,
+        ls.label_name,
+        ls.label_name_en,
+        ls.label_type,
+        ls.first_classification,
+        ls.second_classification,
+        ls.belong_to_business,
+        ls.label_value,
+        ls.source_table,
+        DATE_FORMAT(ls.update_time, '%Y-%m-%d %H:%i:%s') AS update_time,
+        UNIX_TIMESTAMP(ls.update_time) AS update_time2
         FROM
         label_schema ls
         <where>
@@ -47,6 +48,13 @@
             <if test="request.belongToBusiness != null">
                 AND ls.belong_to_business = #{request.belongToBusiness}
             </if>
+            <if test="request.permissions != null and request.permissions.size() > 0">
+                AND ls.permission IN
+                <foreach collection="request.permissions" item="permission" index="index" open="(" close=")"
+                         separator=",">
+                    #{permission}
+                </foreach>
+            </if>
             <if test="request.createStartTime != null and request.createStartTime != ''">
                 AND <![CDATA[ ls.update_time >= FROM_UNIXTIME(#{request.createStartTime} / 1000) ]]>
             </if>
@@ -59,10 +67,10 @@
 
     <insert id="savebatch" parameterType="java.util.List">
         INSERT INTO
-            label_schema(label_name,label_name_en,label_type,first_classification,second_classification,belong_to_business,label_value,source_table,status)
+        label_schema(label_name,label_name_en,label_type,first_classification,second_classification,belong_to_business,label_value,source_table,status)
         VALUES
-        <foreach collection="list" index="index" item="item" separator=",">
-            (#{item.labelName},#{item.labelNameEn},#{item.labelType},#{item.firstClassification},#{item.secondClassification},#{item.belongToBusiness},#{item.labelValue},#{item.sourceTable},1)
+        <foreach collection="list" item="item" index="index" open="(" close=")" separator=",">
+            #{item.labelName},#{item.labelNameEn},#{item.labelType},#{item.firstClassification},#{item.secondClassification},#{item.belongToBusiness},#{item.labelValue},#{item.sourceTable},1
         </foreach>
     </insert>
 
