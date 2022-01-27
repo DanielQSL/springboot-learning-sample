@@ -41,4 +41,9 @@ public class UserServiceImpl implements UserService {
         return page.getList();
     }
 
+    @Override
+    public Long sum() {
+        return null;
+    }
+
 }

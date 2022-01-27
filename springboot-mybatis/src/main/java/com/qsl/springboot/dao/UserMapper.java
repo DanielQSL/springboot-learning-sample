@@ -1,8 +1,10 @@
 package com.qsl.springboot.dao;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.qsl.springboot.dataobject.UserDO;
 import com.qsl.springboot.dto.UserDTO;
 import com.qsl.springboot.dto.UserRequest;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -12,8 +14,8 @@ import java.util.List;
  * @author qianshuailong
  * @date 2020/5/28
  */
-@Repository
-public interface UserMapper {
+@Mapper
+public interface UserMapper extends BaseMapper<UserDO> {
 
     List<UserDO> list();
 
@@ -30,6 +32,6 @@ public interface UserMapper {
      *
      * @param list 集合
      */
-    void savebatch(@Param("list")List<UserDTO> list);
+    void savebatch(@Param("list") List<UserDTO> list);
 
 }
