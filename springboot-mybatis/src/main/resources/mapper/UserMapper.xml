@@ -15,9 +15,21 @@
         <result column="update_time" property="updateTime" jdbcType="VARCHAR"/>
     </resultMap>
 
+    <sql id="user_base_columns">
+        u.id,u.username
+    </sql>
+
+    <sql id="user_base_columns2">
+        ${alias}.id,${alias}.username
+    </sql>
+
     <select id="list" resultType="com.qsl.springboot.dataobject.UserDO">
-        select *
-        from t_user
+        SELECT
+        <include refid="user_base_columns"/>
+        <include refid="user_base_columns2">
+            <property name="alias" value="u"/>
+        </include>
+        FROM t_user u
     </select>
 
     <select id="listTestFormat" resultMap="labelSchemaMap">
