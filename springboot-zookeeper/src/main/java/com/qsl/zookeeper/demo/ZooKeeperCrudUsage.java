@@ -1,4 +1,4 @@
-package com.qsl.zookeeper.usage;
+package com.qsl.zookeeper.demo;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -8,6 +8,7 @@ import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -16,7 +17,7 @@ import java.util.concurrent.CountDownLatch;
  *
  * @author DanielQSL
  */
-public class ZooKeeperUsage {
+public class ZooKeeperCrudUsage {
 
     private static CuratorFramework client;
 
@@ -38,17 +39,23 @@ public class ZooKeeperUsage {
         query();
     }
 
+    private static void create() throws Exception {
+        client.create()
+                .creatingParentsIfNeeded()
+                .withMode(CreateMode.PERSISTENT)
+                .forPath(PATH, "world".getBytes(StandardCharsets.UTF_8));
+        client.close();
+    }
+
     private static void query() throws Exception {
         byte[] bytes = client.getData().forPath(PATH);
         System.out.println(new String(bytes));
         client.close();
     }
 
-    private static void create() throws Exception {
-        client.create()
-                .creatingParentsIfNeeded()
-                .withMode(CreateMode.PERSISTENT)
-                .forPath(PATH, "world".getBytes(StandardCharsets.UTF_8));
+    private static void queryChildren() throws Exception {
+        List<String> children = client.getChildren().forPath(PATH);
+        System.out.println(children);
         client.close();
     }
 
