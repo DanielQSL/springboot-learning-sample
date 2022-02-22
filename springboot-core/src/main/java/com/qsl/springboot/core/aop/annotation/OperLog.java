@@ -5,8 +5,7 @@ import java.lang.annotation.*;
 /**
  * 自定义操作日志注解
  *
- * @author qianshuailong
- * @date 2021/7/6
+ * @author DanielQSL
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
