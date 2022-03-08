@@ -1,5 +1,6 @@
 package com.qsl.springboot.controller;
 
+import com.qsl.springboot.config.RedisLock;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -21,6 +22,9 @@ public class RedissonController {
 
     @Autowired
     private RedissonClient redissonClient;
+
+    @Autowired
+    private RedisLock redisLock;
 
     private static final String LOCK = "my-lock";
 
@@ -65,6 +69,24 @@ public class RedissonController {
             // 3.解锁
             log.info("{} 释放锁", Thread.currentThread().getName());
             lock.unlock();
+        }
+        return "hello";
+    }
+
+    @GetMapping("/hello3")
+    public String hello3() {
+        try {
+            // 加锁
+            boolean lock = redisLock.lock(LOCK);
+            if (!lock) {
+                throw new RuntimeException("加锁失败");
+            }
+            // do something
+        } catch (Exception e) {
+            log.error("error", e);
+        } finally {
+            // 解锁
+            redisLock.unlock(LOCK);
         }
         return "hello";
     }
