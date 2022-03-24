@@ -12,6 +12,7 @@
     <description>SpringBoot学习示例</description>
 
     <modules>
+        <module>springboot-rocketmq</module>
         <module>springboot-zookeeper</module>
         <module>springboot-mybatis-mutil-datasource</module>
         <module>springboot-mybatis</module>

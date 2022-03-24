@@ -1,0 +1,5 @@
+server:
+  port: 5098
+
+rocketmq:
+  name-server: 192.168.8.210:9876
