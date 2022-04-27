@@ -1,5 +1,6 @@
 package com.qsl.rocketmq.mq.consumer;
 
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
@@ -23,7 +24,8 @@ public class TestMqListener implements MessageListenerConcurrently {
         try {
             for (MessageExt messageExt : list) {
                 String message = new String(messageExt.getBody());
-                log.info("收到消息：{}", messageExt.toString());
+                log.info("收到消息：{}", message);
+                log.info("消息详情：{}", JSON.toJSONString(messageExt));
             }
             return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
         } catch (Exception e) {

@@ -1,3 +1,9 @@
 spring:
   application:
     name: SpringBoot-Redisson
+
+  redis:
+    host: 192.168.8.210
+    port: 6379
+    password: 123456
+    timeout: 3000

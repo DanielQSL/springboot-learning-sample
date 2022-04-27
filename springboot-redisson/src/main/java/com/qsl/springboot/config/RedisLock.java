@@ -48,6 +48,28 @@ public class RedisLock {
     }
 
     /**
+     * 阻塞锁
+     *
+     * @param key 键
+     */
+    public boolean blockedLock(String key) {
+        RLock rLock = redissonClient.getLock(key);
+        rLock.lock();
+        return true;
+    }
+
+    /**
+     * 尝试加锁，超过指定时间后，则加锁失败
+     *
+     * @param key     键
+     * @param timeout 超时时间（毫秒）
+     */
+    public boolean tryLock(String key, long timeout) throws InterruptedException {
+        RLock rLock = redissonClient.getLock(key);
+        return rLock.tryLock(timeout, TimeUnit.MILLISECONDS);
+    }
+
+    /**
      * 手动释放锁
      *
      * @param key 键
