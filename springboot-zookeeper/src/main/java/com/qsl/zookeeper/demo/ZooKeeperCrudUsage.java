@@ -25,7 +25,7 @@ public class ZooKeeperCrudUsage {
 
     static {
         client = CuratorFrameworkFactory.builder()
-                .connectString("127.0.0.1:2181")
+                .connectString("192.168.8.210:2181")
                 .sessionTimeoutMs(5000)
                 .connectionTimeoutMs(5000)
                 .retryPolicy(new ExponentialBackoffRetry(1000, 3))
@@ -36,7 +36,11 @@ public class ZooKeeperCrudUsage {
     public static void main(String[] args) throws Exception {
 //        create();
 
+//        update();
+
         query();
+
+        close();
     }
 
     private static void create() throws Exception {
@@ -44,29 +48,25 @@ public class ZooKeeperCrudUsage {
                 .creatingParentsIfNeeded()
                 .withMode(CreateMode.PERSISTENT)
                 .forPath(PATH, "world".getBytes(StandardCharsets.UTF_8));
-        client.close();
     }
 
     private static void query() throws Exception {
         byte[] bytes = client.getData().forPath(PATH);
         System.out.println(new String(bytes));
-        client.close();
+    }
+
+    private static void update() throws Exception {
+        client.setData()
+                .forPath(PATH, "hello world".getBytes(StandardCharsets.UTF_8));
     }
 
     private static void queryChildren() throws Exception {
         List<String> children = client.getChildren().forPath(PATH);
         System.out.println(children);
-        client.close();
     }
 
     private static void delete() throws Exception {
         client.delete().forPath(PATH);
-        client.close();
-    }
-
-    private static void update() throws Exception {
-        client.setData().forPath(PATH, "hello world".getBytes(StandardCharsets.UTF_8));
-        client.close();
     }
 
     private static void asyncCreate() throws Exception {
@@ -91,6 +91,9 @@ public class ZooKeeperCrudUsage {
         };
         client.getData().usingWatcher(w).forPath(PATH);
         countDownLatch.await();
+    }
+
+    private static void close() {
         client.close();
     }
 

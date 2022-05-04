@@ -17,7 +17,7 @@ public class ZooKeeperConfig {
     @Bean(initMethod = "start", destroyMethod = "close")
     public CuratorFramework zookeeperClient() {
         return CuratorFrameworkFactory.builder()
-                .connectString("127.0.0.1:2181")
+                .connectString("192.168.8.210:2181")
                 .sessionTimeoutMs(5000)
                 .connectionTimeoutMs(5000)
                 .retryPolicy(new ExponentialBackoffRetry(1000, 3))
