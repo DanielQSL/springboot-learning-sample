@@ -49,13 +49,13 @@
         </dependency>
         <dependency>
             <groupId>org.apache.curator</groupId>
-            <artifactId>curator-recipes</artifactId>
+            <artifactId>curator-client</artifactId>
             <version>5.2.0</version>
         </dependency>
-
+        <!-- recipes模块会自动引入framework和client模块-->
         <dependency>
             <groupId>org.apache.curator</groupId>
-            <artifactId>curator-client</artifactId>
+            <artifactId>curator-recipes</artifactId>
             <version>5.2.0</version>
             <exclusions>
                 <exclusion>
