@@ -26,14 +26,14 @@ public class RedisController {
         return "ok";
     }
 
-    @GetMapping("/write2")
-    public String write2() {
-        StudentDTO studentDTO = new StudentDTO();
-        studentDTO.setName("张三");
-        studentDTO.setAge(20);
-        redisTemplate.opsForValue().set("zhangsan", studentDTO);
-        StudentDTO zhangsan = (StudentDTO) redisTemplate.opsForValue().get("zhangsan");
-        return "ok";
-    }
+//    @GetMapping("/write2")
+//    public String write2() {
+//        StudentDTO studentDTO = new StudentDTO();
+//        studentDTO.setName("张三");
+//        studentDTO.setAge(20);
+//        redisTemplate.opsForValue().set("zhangsan", studentDTO);
+//        StudentDTO zhangsan = (StudentDTO) redisTemplate.opsForValue().get("zhangsan");
+//        return "ok";
+//    }
 
 }
