@@ -25,6 +25,7 @@
         <module>springboot-core</module>
         <module>springboot-clickhouse</module>
         <module>qsl-spring-boot-starter</module>
+        <module>springboot-kafka</module>
     </modules>
 
 </project>
