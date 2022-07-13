@@ -70,18 +70,23 @@ public class KafkaConsumerConfig {
         Map<String, Object> propsMap = new HashMap<>();
         // Kafka地址
         propsMap.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaConstants.BOOTSTRAP_SERVERS);
-        //配置默认分组，这里没有配置+在监听的地方没有设置groupId，多个服务会出现收到相同消息情况
-        propsMap.put(ConsumerConfig.GROUP_ID_CONFIG, KafkaConstants.TEST_GROUP_ID);
-        // 是否自动提交offset偏移量(默认true)
-        propsMap.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
-        // 自动提交的频率(ms)
-        propsMap.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "100");
-        // Session超时设置
-        propsMap.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "15000");
         // 键的反序列化方式
         propsMap.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         // 值的反序列化方式
         propsMap.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        //两次Poll之间的最大允许间隔。
+        //消费者超过该值没有返回心跳，服务端判断消费者处于非存活状态，服务端将消费者从Consumer Group移除并触发ReBalance，默认30s。
+        propsMap.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "30000");
+        //每次Poll的最大数量。
+        //注意该值不要改得太大，如果Poll太多数据，而不能在下次Poll之前消费完，则会触发一次负载均衡，产生卡顿。
+        propsMap.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 30);
+        // 配置默认分组，属于同一个组的消费实例，会负载消费消息。若没有配置+在监听的地方也没有设置groupId，多个服务会出现收到相同消息情况
+        propsMap.put(ConsumerConfig.GROUP_ID_CONFIG, KafkaConstants.TEST_GROUP_ID);
+
+        // 是否自动提交offset偏移量(默认true)
+        propsMap.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
+        // 自动提交的频率(ms)
+        propsMap.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "100");
         // offset偏移量规则设置：
         // (1)、earliest：当各分区下有已提交的offset时，从提交的offset开始消费；无提交的offset时，从头开始消费
         // (2)、latest：当各分区下有已提交的offset时，从提交的offset开始消费；无提交的offset时，消费新产生的该分区下的数据

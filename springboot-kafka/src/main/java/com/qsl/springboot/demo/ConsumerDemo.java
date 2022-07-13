@@ -19,6 +19,7 @@ public class ConsumerDemo {
 
         Properties props = new Properties();
         props.put("bootstrap.servers", "172.19.21.59:9092");
+        // 属于同一个组的消费实例，会负载消费消息
         props.put("group.id", groupId);
         props.put("enable.auto.commit", "true");
         props.put("auto.commit.ineterval.ms", "1000");
