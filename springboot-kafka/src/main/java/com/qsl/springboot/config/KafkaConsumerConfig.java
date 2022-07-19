@@ -25,7 +25,7 @@ public class KafkaConsumerConfig {
     /**
      * kafka container 工厂，负责创建 container，当使用 @KafkaListener 时需要提供。
      */
-    @Bean
+    @Bean(name = "kafkaListenerContainerFactory1")
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
         // 设置消费者工厂
@@ -42,7 +42,7 @@ public class KafkaConsumerConfig {
 
         // 将过滤器添添加到参数中
         factory.setRecordFilterStrategy(consumerRecord -> {
-            // 设置过滤器，只接收消息内容中包含 "test" 的消息
+            // 只接收消息内容中包含 "test" 的消息
             if (consumerRecord.value().contains("test")) {
                 // 返回 false 则接收消息
                 return false;

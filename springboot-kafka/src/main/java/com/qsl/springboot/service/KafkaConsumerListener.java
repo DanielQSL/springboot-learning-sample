@@ -1,11 +1,10 @@
 package com.qsl.springboot.service;
 
 import com.qsl.springboot.constants.KafkaConstants;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
+import com.qsl.springboot.utils.JsonUtil;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * @author shuailong.qian
@@ -14,13 +13,13 @@ import java.util.List;
 @Component
 public class KafkaConsumerListener {
 
-    @KafkaListener(topics = {KafkaConstants.TEST_TOPIC}, groupId = KafkaConstants.TEST_GROUP_ID_2, containerFactory = "kafkaListenerContainerFactory")
-    public void kafkaListener(List<ConsumerRecord<String, String>> records) {
-        System.out.println("===========" + records);
+    @KafkaListener(topics = {KafkaConstants.TEST_TOPIC}, groupId = KafkaConstants.TEST_GROUP_ID_2, containerFactory = "kafkaListenerContainerFactory1")
+    public void kafkaListener(ConsumerRecords<String, String> records) {
+        System.out.println("===========" + JsonUtil.toJsonString(records));
     }
 
-//    @KafkaListener(topics = {KafkaConstants.TEST_TOPIC})
-//    public void kafkaListener3(String record) {
+//    @KafkaListener(topics = {KafkaConstants.TEST_TOPIC}, groupId = KafkaConstants.TEST_GROUP_ID_2, containerFactory = "kafkaListenerContainerFactory")
+//    public void kafkaListenerSingle(String record) {
 //        System.out.println("===========" + record);
 //    }
 
