@@ -1,4 +1,4 @@
-package com.qsl.springboot;
+package com.qsl.springboot.jwt;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,10 +9,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author DanielQSL
  */
 @SpringBootApplication
-public class KafkaApplication {
+public class JwtApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(KafkaApplication.class, args);
+        SpringApplication.run(JwtApplication.class, args);
     }
 
 }

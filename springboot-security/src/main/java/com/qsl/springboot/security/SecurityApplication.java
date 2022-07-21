@@ -1,4 +1,4 @@
-package com.qsl.springboot;
+package com.qsl.springboot.security;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,10 +9,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author DanielQSL
  */
 @SpringBootApplication
-public class KafkaApplication {
+public class SecurityApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(KafkaApplication.class, args);
+        SpringApplication.run(SecurityApplication.class, args);
     }
 
 }

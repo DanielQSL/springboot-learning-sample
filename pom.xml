@@ -26,6 +26,8 @@
         <module>springboot-clickhouse</module>
         <module>qsl-spring-boot-starter</module>
         <module>springboot-kafka</module>
+        <module>springboot-jwt</module>
+        <module>springboot-security</module>
     </modules>
 
 </project>

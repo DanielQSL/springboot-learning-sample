@@ -1,0 +1,8 @@
+server:
+  port: 9090
+
+jwt:
+  # 密钥
+  secret: qnAqsQa7600vrTBcr1WB8P8dg4cbgS5i8LZGjWnpREL
+  # token 有效期（S)
+  expiration: 30
