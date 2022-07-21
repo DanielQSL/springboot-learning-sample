@@ -2,15 +2,15 @@ package com.qsl.springboot.security.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.UUID;
 
 /**
  * JWT工具类
@@ -20,125 +20,110 @@ import java.util.Map;
 @Component
 public class JwtUtils {
 
-    private static final String CLAIM_KEY_USERNAME = "sub";
-    private static final String CLAIM_KEY_CREATED = "created";
-
     /**
-     * 密钥
+     * 签发者
      */
-    @Value("${jwt.secret}")
-    private String secret;
+    public static final String JWT_ISSUER = "qsl";
 
     /**
-     * token有效期 (S)
+     * token有效期，默认为一周 (ms)
      */
-    @Value("${jwt.expiration}")
-    private Long expiration;
+    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7L;
 
     /**
-     * 根据用户信息生成 token
+     * 密钥 64个字符
+     */
+    @Value("${jwt.secretKey}")
+    private String secretKey;
+
+    /**
+     * 生成 JWT token
      *
-     * @param userInfo
-     * @return
+     * @param subject 主题  可以是JSON数据
+     * @return token
      */
-    public String generateToken(Object userInfo) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put(CLAIM_KEY_USERNAME, JsonUtil.toJsonString(userInfo));
-        claims.put(CLAIM_KEY_CREATED, new Date());
-        return generateToken(claims);
+    public String generateToken(String subject) {
+        return generateToken(UUID.randomUUID().toString(), subject);
     }
 
     /**
-     * 从 token 中获取用户信息
+     * 生成 JWT token
      *
-     * @param token
-     * @param valueType
-     * @param <T>
-     * @return
+     * @param uuid    唯一标识
+     * @param subject 主题  可以是JSON数据
+     * @return token
      */
-    public <T> T getUserInfoFromToken(String token, Class<T> valueType) {
-        Claims claims = getClaimsFromToken(token);
-        return JsonUtil.parseObject(claims.getSubject(), valueType);
-    }
-
-    /**
-     * 判断 token 是否有效
-     *
-     * @param token
-     * @return
-     */
-    public boolean isTokenExpired(String token) {
-        Date expiredDate = getExpiredDateFromToken(token);
-        return expiredDate.after(new Date());
-    }
-
-    /**
-     * 刷新 token
-     *
-     * @param token
-     * @return
-     */
-    public String refreshToken(String token) {
-        Claims claims = getClaimsFromToken(token);
-        claims.put(CLAIM_KEY_CREATED, new Date());
-        return generateToken(claims);
-    }
-
-    /**
-     * 生成 token
-     *
-     * @param claims
-     * @return
-     */
-    private String generateToken(Map<String, Object> claims) {
+    public String generateToken(String uuid, String subject) {
         return Jwts.builder()
-                .setClaims(claims)
-                .setExpiration(generateExpirationDate())
-                .signWith(generateKeyByDecoders())
+                // JWT的唯一标识
+                .setId(uuid)
+                // 主题  可以是JSON数据
+                .setSubject(subject)
+                // 签发者
+                .setIssuer(JWT_ISSUER)
+                // 签发时间
+                .setIssuedAt(new Date())
+                // 过期时间
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(generateKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     /**
-     * 从 token 中获取
-     *
-     * @param token
-     * @return
+     * 生成加密后的秘钥
      */
-    private Claims getClaimsFromToken(String token) {
+    private SecretKey generateKey() {
+        byte[] encodedKey = Base64.getDecoder().decode(secretKey);
+        return new SecretKeySpec(encodedKey, 0, encodedKey.length, "HmacSHA256");
+    }
+
+    /**
+     * 解析JWT Token
+     *
+     * @param token JWT token
+     * @return 数据
+     */
+    public Claims parseJwtToken(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(generateKeyByDecoders())
+                .setSigningKey(generateKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
     }
 
     /**
-     * 生成 token 过期时间
+     * 从JWT Token中获取主题信息
      *
-     * @return
+     * @param token JWT token
+     * @return 主题信息
      */
-    private Date generateExpirationDate() {
-        return new Date(System.currentTimeMillis() + expiration * 1000);
+    public String getSubjectFromToken(String token) {
+        Claims claims = parseJwtToken(token);
+        return claims.getSubject();
     }
 
     /**
-     * 生成自定义 Key
+     * 从JWT Token中获取用户信息
      *
-     * @return
+     * @param token JWT token
+     * @param clazz 返回类型
+     * @param <T>   类型
+     * @return 用户信息
      */
-    private SecretKey generateKeyByDecoders() {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+    public <T> T getUserInfoFromToken(String token, Class<T> clazz) {
+        Claims claims = parseJwtToken(token);
+        return JsonUtil.parseObject(claims.getSubject(), clazz);
     }
 
     /**
-     * 从 token 中获取过期时间
+     * 判断 token 是否有效
      *
-     * @param token
-     * @return
+     * @param token JWT token
+     * @return 是否有效
      */
-    private Date getExpiredDateFromToken(String token) {
-        Claims claims = getClaimsFromToken(token);
-        return claims.getExpiration();
+    public boolean isTokenExpired(String token) {
+        Claims claims = parseJwtToken(token);
+        return claims.getExpiration().after(new Date());
     }
 
 }

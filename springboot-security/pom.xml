@@ -53,6 +53,24 @@
             <version>1.2.79</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.DanielQSL.project-demo</groupId>
+            <artifactId>project-base</artifactId>
+            <version>1.4.2</version>
+        </dependency>
+        <!-- MySQL JDBC驱动 -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- MyBatis-Plus -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>3.4.3.4</version>
+        </dependency>
+
         <!-- SpringSecurity启动器 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -75,6 +93,14 @@
             <version>0.11.2</version>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <!-- jitpack个人私服 -->
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>
