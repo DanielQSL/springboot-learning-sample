@@ -17,3 +17,51 @@ CREATE TABLE `sys_user`
     `del_flag`    INT(11) DEFAULT '0' COMMENT '删除标志（0代表未删除，1代表已删除）',
     PRIMARY KEY (`id`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
+
+CREATE TABLE `sys_menu`
+(
+    `id`          bigint(20) NOT NULL AUTO_INCREMENT,
+    `menu_name`   varchar(64) NOT NULL DEFAULT 'NULL' COMMENT '菜单名',
+    `path`        varchar(200)         DEFAULT NULL COMMENT '路由地址',
+    `component`   varchar(255)         DEFAULT NULL COMMENT '组件路径',
+    `visible`     char(1)              DEFAULT '0' COMMENT '菜单状态（0显示 1隐藏）',
+    `status`      char(1)              DEFAULT '0' COMMENT '菜单状态（0正常 1停用）',
+    `perms`       varchar(100)         DEFAULT NULL COMMENT '权限标识',
+    `icon`        varchar(100)         DEFAULT '#' COMMENT '菜单图标',
+    `create_by`   bigint(20) DEFAULT NULL,
+    `create_time` datetime             DEFAULT NULL,
+    `update_by`   bigint(20) DEFAULT NULL,
+    `update_time` datetime             DEFAULT NULL,
+    `del_flag`    int(11) DEFAULT '0' COMMENT '是否删除（0未删除 1已删除）',
+    `remark`      varchar(500)         DEFAULT NULL COMMENT '备注',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='菜单表';
+
+CREATE TABLE `sys_role`
+(
+    `id`          bigint(20) NOT NULL AUTO_INCREMENT,
+    `name`        varchar(128) DEFAULT NULL,
+    `role_key`    varchar(100) DEFAULT NULL COMMENT '角色权限字符串',
+    `status`      char(1)      DEFAULT '0' COMMENT '角色状态（0正常 1停用）',
+    `del_flag`    int(1) DEFAULT '0' COMMENT 'del_flag',
+    `create_by`   bigint(200) DEFAULT NULL,
+    `create_time` datetime     DEFAULT NULL,
+    `update_by`   bigint(200) DEFAULT NULL,
+    `update_time` datetime     DEFAULT NULL,
+    `remark`      varchar(500) DEFAULT NULL COMMENT '备注',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色表';
+
+CREATE TABLE `sys_role_menu`
+(
+    `role_id` bigint(200) NOT NULL AUTO_INCREMENT COMMENT '角色ID',
+    `menu_id` bigint(200) NOT NULL DEFAULT '0' COMMENT '菜单id',
+    PRIMARY KEY (`role_id`, `menu_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `sys_user_role`
+(
+    `user_id` bigint(200) NOT NULL AUTO_INCREMENT COMMENT '用户id',
+    `role_id` bigint(200) NOT NULL DEFAULT '0' COMMENT '角色id',
+    PRIMARY KEY (`user_id`, `role_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
