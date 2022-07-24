@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -60,7 +61,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // 对于登录接口 允许匿名访问（未登录可以访问，已登录不能访问）
                 .antMatchers("/user/login", "/jwt/**").anonymous()
                 // 对于JWT接口，已登录和未登录都能访问
-                .antMatchers( "/jwt/**").permitAll()
+                .antMatchers("/jwt/**").permitAll()
                 // 资源配置
                 .antMatchers("/dept/**").hasAuthority("system:dept:list")
                 // 除上面外的所有请求全部需要鉴权认证
@@ -78,6 +79,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         // 允许跨域
         http.cors();
+    }
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        // 使其不受安全性检查
+        web.ignoring().antMatchers("/public/**");
     }
 
 }
