@@ -1,4 +1,4 @@
-package com.qsl.springboot.dao;
+package com.qsl.springboot.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.qsl.springboot.dataobject.UserDO;

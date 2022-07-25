@@ -2,7 +2,7 @@ package com.qsl.springboot.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.qsl.springboot.dao.UserMapper;
+import com.qsl.springboot.mapper.UserMapper;
 import com.qsl.springboot.dataobject.UserDO;
 import com.qsl.springboot.service.UserService;
 import lombok.extern.slf4j.Slf4j;
