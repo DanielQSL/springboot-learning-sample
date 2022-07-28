@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.qsl.springboot.dao.UserMapper;
+import com.qsl.springboot.mapper.UserMapper;
 import com.qsl.springboot.dataobject.UserDO;
 import com.qsl.springboot.service.UserService;
 import lombok.extern.slf4j.Slf4j;
