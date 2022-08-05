@@ -27,6 +27,7 @@
         <module>qsl-spring-boot-starter</module>
         <module>springboot-kafka</module>
         <module>springboot-security</module>
+        <module>springboot-bigfile</module>
     </modules>
 
 </project>
