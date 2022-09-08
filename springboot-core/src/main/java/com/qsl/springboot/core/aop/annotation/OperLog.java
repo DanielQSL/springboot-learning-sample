@@ -11,6 +11,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface OperLog {
+
     /**
      * 操作模块
      */
@@ -25,4 +26,5 @@ public @interface OperLog {
      * 操作说明
      */
     String operDesc() default "";
+
 }

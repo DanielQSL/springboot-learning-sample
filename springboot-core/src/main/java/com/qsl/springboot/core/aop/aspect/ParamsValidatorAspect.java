@@ -1,5 +1,6 @@
 package com.qsl.springboot.core.aop.aspect;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -9,12 +10,12 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 方法上的参数校验切面
@@ -55,19 +56,19 @@ public class ParamsValidatorAspect {
         Object target = point.getTarget();
         // 获取方法参数
         Object[] parameterValues = point.getArgs();
-        log.info("请求处理方法: {}.{} 请求参数名: {}，请求参数值: {}", target.getClass().getName(), methodSignature.getMethod().getName(),
-                JSON.toJSONString(parameterNames), JSON.toJSONString(parameterValues));
+        if (log.isDebugEnabled()) {
+            log.debug("请求处理方法: {}.{} 请求参数名: {}，请求参数值: {}", target.getClass().getName(), methodSignature.getMethod().getName(),
+                    JSON.toJSONString(parameterNames), JSON.toJSONString(parameterValues));
+        }
 
         // 参数校验
         for (Object parameterValue : parameterValues) {
             Set<ConstraintViolation<Object>> validateResult = validator.validate(parameterValue);
-            if (!CollectionUtils.isEmpty(validateResult)) {
-                StringBuilder sb = new StringBuilder();
-                for (ConstraintViolation<Object> objectConstraintViolation : validateResult) {
-                    sb.append(objectConstraintViolation.getMessage());
-                    sb.append(",");
-                }
-//                throw new BaseBizException(CookbookErrorCodeEnum.PARAM_CHECK_ERROR, sb.substring(0, sb.length() - 1));
+            if (CollectionUtil.isNotEmpty(validateResult)) {
+                String errorMsg = validateResult.stream()
+                        .map(ConstraintViolation::getMessage)
+                        .collect(Collectors.joining("; "));
+//                throw new BaseBizException(ErrorCodeEnum.PARAM_CHECK_ERROR, errorMsg.substring(0, errorMsg.length() - 1));
             }
         }
         return point.proceed();

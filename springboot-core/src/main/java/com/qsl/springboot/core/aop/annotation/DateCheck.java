@@ -1,11 +1,11 @@
 package com.qsl.springboot.core.aop.annotation;
 
-import cn.hutool.core.date.DatePattern;
 import com.qsl.springboot.core.aop.aspect.DateCheckValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.Documented;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -17,32 +17,32 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *
  * @author DanielQSL
  */
-@Target({FIELD, METHOD, PARAMETER, ANNOTATION_TYPE})
-@Retention(RUNTIME)
-@Constraint(validatedBy = DateCheckValidator.class) // 指定验证器
 @Documented
+@Constraint(validatedBy = DateCheckValidator.class)
+@Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
+@Retention(RUNTIME)
+@Repeatable(DateCheck.List.class)
 public @interface DateCheck {
 
-    /**
-     * 默认的错误提示语
-     */
     String message() default "日期格式不正确";
 
-    /**
-     * 日期格式, 默认: yyyy-MM-dd HH:mm:ss
-     */
-    String type() default DatePattern.NORM_DATETIME_PATTERN;
+    boolean required() default true;
 
     /**
-     * 是否允许空值, 默认: true
+     * 日期格式
      */
-    boolean allowEmpty() default true;
+    String pattern() default "yyyy-MM-dd HH:mm:ss";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
 
-    @Target({FIELD, METHOD, PARAMETER, ANNOTATION_TYPE})
+    /**
+     * Defines several {@link DateCheck} annotations on the same element.
+     *
+     * @see DateCheck
+     */
+    @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
     @Retention(RUNTIME)
     @Documented
     @interface List {

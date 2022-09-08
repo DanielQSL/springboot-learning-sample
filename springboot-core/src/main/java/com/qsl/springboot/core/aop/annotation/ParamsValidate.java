@@ -1,16 +1,15 @@
 package com.qsl.springboot.core.aop.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * 方法上的参数校验
  *
  * @author DanielQSL
  */
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface ParamsValidate {
+
 }

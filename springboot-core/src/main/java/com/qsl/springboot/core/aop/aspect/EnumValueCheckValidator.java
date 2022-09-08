@@ -1,7 +1,6 @@
 package com.qsl.springboot.core.aop.aspect;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.qsl.springboot.core.aop.annotation.EnumValueCheck;
@@ -11,6 +10,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * 枚举值检查校验
@@ -20,17 +20,17 @@ import java.util.Collection;
 @Slf4j
 public class EnumValueCheckValidator implements ConstraintValidator<EnumValueCheck, Object> {
 
-    private Class<?> clz;
+    private boolean required;
+
+    private Class<? extends Enum<?>> enumClass;
 
     private String field;
 
-    private boolean allowEmpty;
-
     @Override
     public void initialize(EnumValueCheck constraintAnnotation) {
-        this.clz = constraintAnnotation.clz();
-        this.field = StrUtil.blankToDefault(constraintAnnotation.field(), "value");
-        this.allowEmpty = !constraintAnnotation.required();
+        this.field = constraintAnnotation.field();
+        this.required = constraintAnnotation.required();
+        this.enumClass = constraintAnnotation.clazz();
     }
 
     @Override
@@ -38,45 +38,39 @@ public class EnumValueCheckValidator implements ConstraintValidator<EnumValueChe
         if (StrUtil.isBlank(field)) {
             return false;
         }
-        if (null == value) {
-            return allowEmpty;
+        if (Objects.isNull(value)) {
+            return !required;
         }
         if (value instanceof Collection) {
             Collection<?> coll = (Collection<?>) value;
             if (CollUtil.isEmpty(coll)) {
-                return allowEmpty;
+                return !required;
             }
-            for (Object o : coll) {
-                boolean res = checkSingleObj(o);
-                if (!res) {
+            for (Object obj : coll) {
+                if (!isValid(obj, context)) {
                     return false;
                 }
             }
             return true;
         } else {
-            return checkSingleObj(value);
-        }
-    }
-
-    public boolean checkSingleObj(Object value) {
-        if (value instanceof String) {
-            String strVal = (String) value;
-            if (StrUtil.isBlank(strVal)) {
-                return allowEmpty;
-            }
-        }
-        try {
-            Method m = ReflectUtil.getMethodByName(clz, "values");
-            Object[] enumObjs = ReflectUtil.invokeStatic(m);
-            for (Object enumObj : enumObjs) {
-                Object enumValue = ReflectUtil.invoke(enumObj, "get" + captureName(field));
-                if (ObjectUtil.equal(value, enumValue)) {
-                    return true;
+            if (value instanceof String) {
+                String strVal = (String) value;
+                if (StrUtil.isBlank(strVal)) {
+                    return !required;
                 }
             }
-            return false;
-        } catch (Throwable t) {
-            log.error("EnumValueCheckValidator error", t);
+            try {
+                Method m = ReflectUtil.getMethodByName(enumClass, "values");
+                Object[] enumObjs = ReflectUtil.invokeStatic(m);
+                for (Object enumObj : enumObjs) {
+                    Object enumValue = ReflectUtil.invoke(enumObj, "get" + captureName(field));
+                    if (Objects.equals(value, enumValue)) {
+                        return true;
+                    }
+                }
+            } catch (Throwable t) {
+                log.error("EnumValueCheckValidator error", t);
+            }
             return false;
         }
     }
