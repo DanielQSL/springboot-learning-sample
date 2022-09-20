@@ -28,6 +28,7 @@
         <module>springboot-kafka</module>
         <module>springboot-security</module>
         <module>springboot-bigfile</module>
+        <module>java-jmh</module>
     </modules>
 
 </project>
