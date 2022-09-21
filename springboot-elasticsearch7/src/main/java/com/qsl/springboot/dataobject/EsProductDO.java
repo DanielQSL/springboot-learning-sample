@@ -3,11 +3,10 @@ package com.qsl.springboot.dataobject;
 import lombok.Data;
 
 /**
- * @author qianshuailong
- * @date 2020/7/7
+ * @author DanielQSL
  */
 @Data
-public class ESProductDO {
+public class EsProductDO {
 
     /**
      * ID 主键

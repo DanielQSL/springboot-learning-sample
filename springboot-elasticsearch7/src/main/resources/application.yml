@@ -1,6 +1,4 @@
 elasticsearch:
-  host: 172.16.20.187
-  port: 9200
-  connTimeout: 3000
-  socketTimeout: 5000
-  connectionRequestTimeout: 500
+  clusterNodes: 192.168.0.1:9200,192.168.0.2:9200
+  username: admin
+  password: 123456
