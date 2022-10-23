@@ -38,8 +38,12 @@ import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.metrics.Avg;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.sort.SortOrder;
@@ -349,10 +353,23 @@ public class EsUsage {
         // 分组查询
         AggregationBuilder aggregationBuilder2 = AggregationBuilders.terms("ageGroup").field("age");
         searchSourceBuilder.aggregation(aggregationBuilder2);
+        // 平均值
+        AggregationBuilder aggregationBuilder3 = AggregationBuilders.avg("avgAge").field("age");
+        searchSourceBuilder.aggregation(aggregationBuilder3);
 
         searchRequest.source(searchSourceBuilder);
 
         SearchResponse searchResponse = restClient.search(searchRequest, ElasticsearchConfig.COMMON_OPTIONS);
+        // 获取聚合结果
+        Aggregations aggregationResults = searchResponse.getAggregations();
+        for (Aggregation aggregationResult : aggregationResults.asList()) {
+            System.out.println(aggregationResult.getName());
+        }
+        final Avg maxAge = aggregationResults.get("avgAge");
+        final Terms termAge = aggregationResults.get("avgAge");
+        for (Terms.Bucket bucket : termAge.getBuckets()) {
+            System.out.println(bucket.getKeyAsString());
+        }
     }
 
     /**
