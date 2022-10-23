@@ -12,6 +12,8 @@ import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
+import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.ClearScrollRequest;
@@ -26,13 +28,21 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexResponse;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -70,7 +80,9 @@ public class EsUsage {
                 + "            }\n"
                 + "        }", XContentType.JSON);
         CreateIndexResponse createIndexResponse = restClient.indices().create(createIndexRequest, ElasticsearchConfig.COMMON_OPTIONS);
-        log.info("create index {} response:{}", index, createIndexResponse.isAcknowledged());
+        // 响应状态
+        boolean acknowledged = createIndexResponse.isAcknowledged();
+        log.info("create index {} response:{}", index, acknowledged);
     }
 
     /**
@@ -97,15 +109,24 @@ public class EsUsage {
         }
     }
 
+    private TestData generateTestData() {
+        TestData expectedData = new TestData();
+        expectedData.setId(1001);
+        expectedData.setName("张三");
+        expectedData.setAge(20);
+        return expectedData;
+    }
+
     /**
-     * 导入数据
+     * 插入数据
      */
-    private void insertData(TestData data) throws IOException {
-        IndexRequest indexRequest = new IndexRequest(TEST_INDEX);
+    private void insertData(String index, TestData data) throws IOException {
+        IndexRequest indexRequest = new IndexRequest(index);
         // 设置ID，不设置则默认生成UUID
         indexRequest.id(data.getId().toString());
         // 强制刷新数据
         indexRequest.setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
+        // 将数据转换为json格式
         indexRequest.source(JSON.toJSONString(data), XContentType.JSON);
         IndexResponse response = restClient.index(indexRequest, ElasticsearchConfig.COMMON_OPTIONS);
         Assert.isTrue(RestStatus.CREATED.equals(response.status()));
@@ -113,11 +134,12 @@ public class EsUsage {
 
     /**
      * 精确查询
+     * 根据业务id查询
      */
-    private void queryById(TestData expectedData) throws IOException {
+    private void queryByBusinessId(String businessId) throws IOException {
         SearchRequest searchRequest = new SearchRequest(TEST_INDEX);
         searchRequest.source(new SearchSourceBuilder()
-                .query(QueryBuilders.termQuery("id", expectedData.getId()))
+                .query(QueryBuilders.termQuery("id", businessId))
         );
         SearchResponse searchResponse = restClient.search(searchRequest, ElasticsearchConfig.COMMON_OPTIONS);
         Assert.isTrue(RestStatus.OK.equals(searchResponse.status()));
@@ -128,23 +150,37 @@ public class EsUsage {
 
         // 判断查询数据和插入数据是否相等
         String dataJson = hits.getHits()[0].getSourceAsString();
-        Assert.isTrue(JSON.toJSONString(expectedData).equals(dataJson));
+        Assert.isTrue(JSON.toJSONString(generateTestData()).equals(dataJson));
+    }
+
+    /**
+     * 根据id查询数据
+     */
+    private void queryById(String id) throws IOException {
+        GetRequest getRequest = new GetRequest();
+        getRequest.index(TEST_INDEX).id(id);
+        GetResponse getResponse = restClient.get(getRequest, ElasticsearchConfig.COMMON_OPTIONS);
+        Assert.isTrue(getResponse.isExists());
+
+        // 判断查询数据和插入数据是否相等
+        String dataJson = getResponse.getSourceAsString();
+        System.out.println(dataJson);
     }
 
     /**
      * 更新数据
      */
     public void update() throws IOException {
-        // 插入数据
+        // 先插入数据
         TestData data = new TestData(3, "测试数据03", 29);
-        this.insertData(data);
+        this.insertData(TEST_INDEX, data);
 
         // 更新数据
         data.setName("测试数据被更新");
-        UpdateRequest updateRequest = new UpdateRequest(TEST_INDEX, data.getId().toString());
 
+        UpdateRequest updateRequest = new UpdateRequest(TEST_INDEX, data.getId().toString());
         updateRequest.doc(JSON.toJSONString(data), XContentType.JSON);
-        // 强制刷新数据
+        // 强制刷新数据（也可以不需要）
         updateRequest.setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
         UpdateResponse updateResponse = restClient.update(updateRequest, ElasticsearchConfig.COMMON_OPTIONS);
         Assert.isTrue(RestStatus.OK.equals(updateResponse.status()));
@@ -177,6 +213,146 @@ public class EsUsage {
         if (bulkResponse.hasFailures()) {
             log.error("bulk index failed.{}", bulkResponse.buildFailureMessage());
         }
+        System.out.println(bulkResponse.getTook());
+    }
+
+    /**
+     * 全量查询
+     */
+    public void queryAll(String index) throws IOException {
+        SearchRequest searchRequest = new SearchRequest(index);
+        searchRequest.source(new SearchSourceBuilder()
+                .query(QueryBuilders.matchAllQuery())
+        );
+
+        SearchResponse searchResponse = restClient.search(searchRequest, ElasticsearchConfig.COMMON_OPTIONS);
+        Assert.isTrue(RestStatus.OK.equals(searchResponse.status()));
+        System.out.println(searchResponse.getTook());
+
+        final SearchHits hits = searchResponse.getHits();
+        System.out.println(hits.getTotalHits());
+        for (SearchHit hit : hits) {
+            System.out.println(hit.getSourceAsString());
+        }
+    }
+
+    /**
+     * 条件查询
+     */
+    public void queryByCondition(String index) throws IOException {
+        SearchRequest searchRequest = new SearchRequest(index);
+        searchRequest.source(new SearchSourceBuilder()
+                .query(QueryBuilders.termQuery("age", 30))
+        );
+
+        SearchResponse searchResponse = restClient.search(searchRequest, ElasticsearchConfig.COMMON_OPTIONS);
+    }
+
+    /**
+     * 分页查询、排序、过滤字段
+     */
+    public void queryByPage(String index) throws IOException {
+        SearchRequest searchRequest = new SearchRequest(index);
+        final SearchSourceBuilder searchBuilder = new SearchSourceBuilder()
+                .query(QueryBuilders.termQuery("age", 30));
+        // 排序
+        searchBuilder.sort("age", SortOrder.DESC);
+        // 分页
+        searchBuilder.from(0).size(2);
+        // 过滤字段
+        String[] excludes = {"age"};
+        String[] includes = {};
+        searchBuilder.fetchSource(includes, excludes);
+        searchRequest.source(searchBuilder);
+
+        SearchResponse searchResponse = restClient.search(searchRequest, ElasticsearchConfig.COMMON_OPTIONS);
+    }
+
+    /**
+     * 组合查询
+     */
+    public void queryByCombine(String index) throws IOException {
+        SearchRequest searchRequest = new SearchRequest(index);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        boolQueryBuilder.must(QueryBuilders.matchQuery("age", 30));
+        boolQueryBuilder.mustNot(QueryBuilders.matchQuery("sex", "男"));
+        searchSourceBuilder.query(boolQueryBuilder);
+
+        searchRequest.source(searchSourceBuilder);
+
+        SearchResponse searchResponse = restClient.search(searchRequest, ElasticsearchConfig.COMMON_OPTIONS);
+    }
+
+    /**
+     * 范围查询
+     */
+    public void queryByRange(String index) throws IOException {
+        SearchRequest searchRequest = new SearchRequest(index);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+
+        RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("age");
+        rangeQueryBuilder.gte(30);
+        rangeQueryBuilder.lte(40);
+        searchSourceBuilder.query(rangeQueryBuilder);
+
+        searchRequest.source(searchSourceBuilder);
+
+        SearchResponse searchResponse = restClient.search(searchRequest, ElasticsearchConfig.COMMON_OPTIONS);
+    }
+
+    /**
+     * 模糊查询
+     */
+    public void queryByLike(String index) throws IOException {
+        SearchRequest searchRequest = new SearchRequest(index);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+
+        // fuzziness表示模糊多少个字符
+        searchSourceBuilder.query(QueryBuilders.fuzzyQuery("name", "wang").fuzziness(Fuzziness.ONE));
+
+        searchRequest.source(searchSourceBuilder);
+
+        SearchResponse searchResponse = restClient.search(searchRequest, ElasticsearchConfig.COMMON_OPTIONS);
+    }
+
+    /**
+     * 高亮查询
+     */
+    public void queryByHighLight(String index) throws IOException {
+        SearchRequest searchRequest = new SearchRequest(index);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+
+        final TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("name", "zhangsan");
+        searchSourceBuilder.query(termQueryBuilder);
+        HighlightBuilder highlightBuilder = new HighlightBuilder();
+        highlightBuilder.preTags("<font color='red'>").postTags("</font>");
+        highlightBuilder.field("name");
+        searchSourceBuilder.highlighter(highlightBuilder);
+
+        searchRequest.source(searchSourceBuilder);
+
+        SearchResponse searchResponse = restClient.search(searchRequest, ElasticsearchConfig.COMMON_OPTIONS);
+    }
+
+    /**
+     * 聚合查询
+     */
+    public void queryByAgg(String index) throws IOException {
+        SearchRequest searchRequest = new SearchRequest(index);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+
+        // 聚合查询
+        AggregationBuilder aggregationBuilder1 = AggregationBuilders.max("maxAge").field("age");
+        searchSourceBuilder.aggregation(aggregationBuilder1);
+        // 分组查询
+        AggregationBuilder aggregationBuilder2 = AggregationBuilders.terms("ageGroup").field("age");
+        searchSourceBuilder.aggregation(aggregationBuilder2);
+
+        searchRequest.source(searchSourceBuilder);
+
+        SearchResponse searchResponse = restClient.search(searchRequest, ElasticsearchConfig.COMMON_OPTIONS);
     }
 
     /**
