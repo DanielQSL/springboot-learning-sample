@@ -48,9 +48,6 @@ public class ElasticsearchConfig {
      */
     public static int MAX_CONN_TOTAL = 30;
 
-    /**
-     * ES集群节点，以 , 分隔多节点
-     */
     @Value("${elasticsearch.clusterNodes}")
     private String clusterNodes;
 
@@ -76,9 +73,11 @@ public class ElasticsearchConfig {
         COMMON_OPTIONS = builder.build();
     }
 
+    /**
+     * ES高级客户端
+     */
     @Bean(name = "restClient", destroyMethod = "close")
     public RestHighLevelClient restClient() {
-        // 创建restClient的构造器
         RestClientBuilder restClientBuilder = RestClient.builder(loadHttpHosts());
         setTimeOutConfig(restClientBuilder);
         setConnectConfig(restClientBuilder);

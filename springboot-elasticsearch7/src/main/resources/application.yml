@@ -1,4 +1,6 @@
+# Elasticsearch相关配置
 elasticsearch:
+  # 集群节点，多个节点采用逗号分割
   clusterNodes: 192.168.0.1:9200,192.168.0.2:9200
   username: admin
   password: 123456
